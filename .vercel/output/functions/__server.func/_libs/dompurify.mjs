@@ -1,6 +1,6 @@
 import { t as __commonJSMin } from "../_runtime.mjs";
 //#region node_modules/dompurify/dist/purify.cjs.js
-/*! @license DOMPurify 3.4.14 | (c) Cure53 and other contributors | Released under the Apache license 2.0 and Mozilla Public License 2.0 | github.com/cure53/DOMPurify/blob/3.4.14/LICENSE */
+/*! @license DOMPurify 3.4.15 | (c) Cure53 and other contributors | Released under the Apache license 2.0 and Mozilla Public License 2.0 | github.com/cure53/DOMPurify/blob/3.4.15/LICENSE */
 var require_purify_cjs = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	function _arrayLikeToArray(r, a) {
 		(null == a || a > r.length) && (a = r.length);
@@ -996,7 +996,7 @@ var require_purify_cjs = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	function createDOMPurify() {
 		let window = arguments.length > 0 && arguments[0] !== void 0 ? arguments[0] : getGlobal();
 		const DOMPurify = (root) => createDOMPurify(root);
-		DOMPurify.version = "3.4.14";
+		DOMPurify.version = "3.4.15";
 		DOMPurify.removed = [];
 		if (!window || !window.document || window.document.nodeType !== NODE_TYPE.document || !window.Element) {
 			DOMPurify.isSupported = false;
@@ -1013,6 +1013,7 @@ var require_purify_cjs = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 		const ElementPrototype = Element.prototype;
 		const cloneNode = lookupGetter(ElementPrototype, "cloneNode");
 		const remove = lookupGetter(ElementPrototype, "remove");
+		const removeAttributeNode = lookupGetter(ElementPrototype, "removeAttributeNode");
 		const getNextSibling = lookupGetter(ElementPrototype, "nextSibling");
 		const getChildNodes = lookupGetter(ElementPrototype, "childNodes");
 		const getParentNode = lookupGetter(ElementPrototype, "parentNode");
@@ -1467,7 +1468,7 @@ var require_purify_cjs = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 		*/
 		const _stripAttributeNode = function _stripAttributeNode(element, attribute, name) {
 			try {
-				element.removeAttributeNode(attribute);
+				removeAttributeNode(element, attribute);
 			} catch (_) {
 				try {
 					element.removeAttribute(name);
@@ -1540,7 +1541,7 @@ var require_purify_cjs = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 				from: element
 			});
 			try {
-				if (attr) element.removeAttributeNode(attr);
+				if (attr) removeAttributeNode(element, attr);
 				else element.removeAttribute(name);
 			} catch (_) {
 				try {
@@ -1786,7 +1787,7 @@ var require_purify_cjs = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 			const realTagName = getNodeName ? getNodeName(element) : null;
 			if (typeof realTagName !== "string") return false;
 			if (transformCaseFunc(realTagName) !== "form") return false;
-			return typeof element.nodeName !== "string" || typeof element.textContent !== "string" || typeof element.removeChild !== "function" || element.attributes !== getAttributes(element) || typeof element.removeAttribute !== "function" || typeof element.setAttribute !== "function" || typeof element.namespaceURI !== "string" || typeof element.insertBefore !== "function" || typeof element.hasChildNodes !== "function" || element.nodeType !== getNodeType(element) || element.childNodes !== getChildNodes(element);
+			return typeof element.nodeName !== "string" || typeof element.textContent !== "string" || typeof element.removeChild !== "function" || element.attributes !== getAttributes(element) || typeof element.removeAttribute !== "function" || typeof element.removeAttributeNode !== "function" || typeof element.getAttributeNode !== "function" || typeof element.setAttribute !== "function" || typeof element.namespaceURI !== "string" || typeof element.insertBefore !== "function" || typeof element.hasChildNodes !== "function" || element.nodeType !== getNodeType(element) || element.childNodes !== getChildNodes(element);
 		};
 		/**
 		* Checks whether the given value is a DocumentFragment from any realm.
@@ -2071,24 +2072,38 @@ var require_purify_cjs = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 		/**
 		* Write a modified attribute value back onto the element. On
 		* success, re-probe for clobbering introduced by the new value and
-		* remove the element when found; otherwise pop the removal entry
-		* recorded by the earlier _removeAttribute (long-standing pairing
-		* with the SANITIZE_NAMED_PROPS path - do not "fix" casually). On
+		* remove the element when found; otherwise, when this writeback is the
+		* recreate half of the SANITIZE_NAMED_PROPS remove-and-recreate, pop the
+		* removal entry that path recorded so it does not show as removed. On
 		* failure, remove the attribute instead.
+		*
+		* Returns true only on a clean write (the value was set and the new value
+		* introduced no clobbering). The caller uses that, together with its own
+		* knowledge of whether this attribute pushed a DOMPurify.removed record, to
+		* decide whether to pop that record. The pop must happen ONLY for the
+		* named-prop remove-and-recreate; popping on any other value change (trim,
+		* template scrubbing, Trusted Types) would consume an unrelated _forceRemove
+		* subtree-cleanup record and let that detached subtree keep a live event
+		* handler through the IN_PLACE neutralization pass (SO-001).
 		*
 		* @param currentNode the element carrying the attribute
 		* @param name the attribute name as present on the element
 		* @param namespaceURI the attribute's namespace, if any
 		* @param value the new attribute value
+		* @return true if the value was written without introducing clobbering
 		*/
 		const _setAttributeValue = function _setAttributeValue(currentNode, name, namespaceURI, value) {
 			try {
 				if (namespaceURI) currentNode.setAttributeNS(namespaceURI, name, value);
 				else currentNode.setAttribute(name, value);
-				if (_isClobbered(currentNode)) _forceRemove(currentNode);
-				else arrayPop(DOMPurify.removed);
+				if (_isClobbered(currentNode)) {
+					_forceRemove(currentNode);
+					return false;
+				}
+				return true;
 			} catch (_) {
 				_removeAttribute(name, currentNode);
+				return false;
 			}
 		};
 		/**
@@ -2121,6 +2136,7 @@ var require_purify_cjs = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 				const lcName = transformCaseFunc(name);
 				const initValue = attrValue;
 				let value = name === "value" ? initValue : stringTrim(initValue);
+				let recreatedNamedProp = false;
 				hookEvent.attrName = lcName;
 				hookEvent.attrValue = value;
 				hookEvent.keepAttr = true;
@@ -2130,6 +2146,7 @@ var require_purify_cjs = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 				if (SANITIZE_NAMED_PROPS && (lcName === "id" || lcName === "name") && stringIndexOf(value, SANITIZE_NAMED_PROPS_PREFIX) !== 0) {
 					_removeAttribute(name, currentNode, attr);
 					value = SANITIZE_NAMED_PROPS_PREFIX + value;
+					recreatedNamedProp = true;
 				}
 				if (SAFE_FOR_XML && regExpTest(/((--!?|])>)|<\/(style|script|title|xmp|textarea|noscript|iframe|noembed|noframes)/i, value)) {
 					_removeAttribute(name, currentNode, attr);
@@ -2154,7 +2171,9 @@ var require_purify_cjs = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 					continue;
 				}
 				value = _applyTrustedTypesToAttribute(lcTag, lcName, namespaceURI, value);
-				if (value !== initValue) _setAttributeValue(currentNode, name, namespaceURI, value);
+				if (value !== initValue) {
+					if (_setAttributeValue(currentNode, name, namespaceURI, value) && recreatedNamedProp) arrayPop(DOMPurify.removed);
+				}
 			}
 			_executeHooks(hooks.afterSanitizeAttributes, currentNode, null);
 		};
@@ -2288,7 +2307,7 @@ var require_purify_cjs = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 				if (importedNode.nodeType === NODE_TYPE.element && importedNode.nodeName === "BODY") body = importedNode;
 				else if (importedNode.nodeName === "HTML") body = importedNode;
 				else body.appendChild(importedNode);
-				_sanitizeAttachedShadowRoots(importedNode);
+				_sanitizeAttachedShadowRoots(body);
 			} else {
 				if (!RETURN_DOM && !SAFE_FOR_TEMPLATES && !WHOLE_DOCUMENT && dirty.indexOf("<") === -1) return trustedTypesPolicy && RETURN_TRUSTED_TYPE ? _createTrustedHTML(dirty) : dirty;
 				body = _initDocument(dirty);

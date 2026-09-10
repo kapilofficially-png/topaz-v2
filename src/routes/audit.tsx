@@ -8,6 +8,7 @@ import {
   Eye,
   EyeOff,
   FileDown,
+  FileText,
   Globe,
   Handshake,
   ListChecks,
@@ -1087,13 +1088,28 @@ function AuditPage() {
       const stem = pageUrl ? (pages[0]?.kind ?? "policy") : "original-policies";
       const filename = `NyayaDraft-${session.host.replace(/[^\w.-]+/g, "-")}-${stem}`;
       if (format === "pdf") {
-        await downloadOriginalPoliciesPdf({
-          host: session.host,
-          homeTitle: session.homeTitle || session.host,
-          origin: session.origin,
-          pages,
-          filename: `${filename}.pdf`,
-        });
+        if (pages.length === 1 && pages[0]?.pdfBase64) {
+          const byteCharacters = atob(pages[0].pdfBase64);
+          const byteNumbers = new Uint8Array(byteCharacters.length);
+          for (let i = 0; i < byteCharacters.length; i++) {
+            byteNumbers[i] = byteCharacters.charCodeAt(i);
+          }
+          const blob = new Blob([byteNumbers], { type: "application/pdf" });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `${filename}.pdf`;
+          a.click();
+          URL.revokeObjectURL(url);
+        } else {
+          await downloadOriginalPoliciesPdf({
+            host: session.host,
+            homeTitle: session.homeTitle || session.host,
+            origin: session.origin,
+            pages,
+            filename: `${filename}.pdf`,
+          });
+        }
       } else {
         const body = pages
           .map(
@@ -1764,6 +1780,16 @@ function AuditPage() {
                           ) : null}
                         </div>
                         <Badge variant="outline">{p.chars.toLocaleString("en-IN")} chars</Badge>
+                        {p.fetchedAsPdf ? (
+                          <Badge
+                            variant="outline"
+                            className="border-emerald-200 bg-emerald-50 text-emerald-800"
+                            title="Rendered and extracted from live headless Chrome PDF"
+                          >
+                            <FileText className="mr-1 size-3 text-emerald-600" />
+                            Live PDF {p.pdfPageCount ? `(${p.pdfPageCount}p)` : ""}
+                          </Badge>
+                        ) : null}
                         <Button
                           variant={p.hidden ? "default" : "outline"}
                           size="sm"

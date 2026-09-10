@@ -7,13 +7,14 @@ import {
   type PolicyKind,
   type ResearchResult,
 } from "./types";
+import { fetchLivePageAsPdf } from "./pdf-fetch";
 
-const MAX_BYTES = 280_000;
+const MAX_BYTES = 5_000_000;
 const MAX_TEXT = 80_000;
-const FETCH_MS = 12_000;
-const MAX_PAGES = 12;
+const FETCH_MS = 15_000;
+const MAX_PAGES = 16;
 const USER_AGENT =
-  "Mozilla/5.0 (compatible; NyayaDraft/1.0; +https://grok.com) AppleWebKit/537.36 Chrome/126.0.0.0";
+  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36";
 
 const PRIVATE_HOST =
   /^(localhost|127\.|0\.0\.0\.0|10\.|192\.168\.|169\.254\.|::1$|\[::1\])/i;
@@ -27,7 +28,7 @@ const KIND_RULES: { kind: PolicyKind; re: RegExp }[] = [
   { kind: "consent", re: /consent[\s/_-]*policy|cookie[\s/_-]*(policy|notice)/i },
   {
     kind: "return",
-    re: /return[\s/_-]*policy|\/return-policy\b|exchange[\s/_-]*policy|\/faqs-exchange/i,
+    re: /returns?[\s/_-]*(?:and|&)?[\s/_-]*(?:refund|cancellation)|return[\s/_-]*policy|\/returns?\b|\/return-policy\b|exchange[\s/_-]*policy|\/faqs-exchange/i,
   },
   { kind: "cancellation", re: /cancellation[\s/_-]*policy|\/cancellation-policy\b/i },
   { kind: "refund", re: /refund|\/faqs-refund/i },
@@ -47,9 +48,13 @@ const CANDIDATE_PATHS: { path: string; kind: PolicyKind }[] = [
   { path: "/policies/cookie-policy", kind: "consent" },
   { path: "/policies/cancellation-policy", kind: "cancellation" },
   { path: "/policies/contact-information", kind: "contact" },
+  { path: "/policies/contact-us", kind: "contact" },
   { path: "/pages/privacy-policy", kind: "privacy" },
   { path: "/pages/refund-policy", kind: "refund" },
   { path: "/pages/return-policy", kind: "return" },
+  { path: "/pages/returns-and-refund", kind: "return" },
+  { path: "/pages/return-and-refund", kind: "return" },
+  { path: "/pages/refund-and-cancellation", kind: "refund" },
   { path: "/pages/terms-of-service", kind: "terms" },
   { path: "/pages/terms-and-conditions", kind: "terms" },
   { path: "/pages/terms-conditions", kind: "terms" },
@@ -58,6 +63,9 @@ const CANDIDATE_PATHS: { path: string; kind: PolicyKind }[] = [
   { path: "/pages/cookie-policy", kind: "consent" },
   { path: "/pages/cancellation-policy", kind: "cancellation" },
   { path: "/pages/contact", kind: "contact" },
+  { path: "/pages/contact-us", kind: "contact" },
+  { path: "/contact-us", kind: "contact" },
+  { path: "/contact", kind: "contact" },
   { path: "/privacy-policy", kind: "privacy" },
   { path: "/refund-policy", kind: "refund" },
   { path: "/terms-of-service", kind: "terms" },
@@ -160,23 +168,33 @@ function decodeEntities(s: string): string {
 }
 
 export function htmlToText(html: string): string {
-  const stripped = stripHiddenBlocks(html)
+  const stripped = html
     .replace(/<script[\s\S]*?<\/script>/gi, " ")
     .replace(/<style[\s\S]*?<\/style>/gi, " ")
     .replace(/<noscript[\s\S]*?<\/noscript>/gi, " ")
     .replace(/<svg[\s\S]*?<\/svg>/gi, " ")
     .replace(/<!--[\s\S]*?-->/g, " ");
+
   const main =
+    extractBlock(stripped, /<div\b[^>]*class=["'][^"']*shopify-policy__container[^"']*["'][^>]*>/i) ??
+    extractBlock(stripped, /<div\b[^>]*class=["'][^"']*shopify-policy__body[^"']*["'][^>]*>/i) ??
+    extractBlock(stripped, /<div\b[^>]*class=["'][^"']*(?:policy-content|policy__content|policy-body|legal-content|policy-container)[^"']*["'][^>]*>/i) ??
     extractBlock(stripped, /<main\b[^>]*>/i) ??
     extractBlock(stripped, /<div\b[^>]*id=["']MainContent["'][^>]*>/i) ??
-    extractBlock(stripped, /<div\b[^>]*class=["'][^"']*shopify-policy__body[^"']*["'][^>]*>/i) ??
     extractBlock(stripped, /<div\b[^>]*class=["'][^"']*faqordr[^"']*["'][^>]*>/i) ??
     extractBlock(stripped, /<article\b[^>]*>/i) ??
     stripped;
+
+  const withoutNav = main
+    .replace(/<header[\s\S]*?<\/header>/gi, " ")
+    .replace(/<nav[\s\S]*?<\/nav>/gi, " ")
+    .replace(/<footer[\s\S]*?<\/footer>/gi, " ")
+    .replace(/<aside[\s\S]*?<\/aside>/gi, " ");
+
   const text = decodeEntities(
-    convertLists(nestOrphanLists(main))
+    convertLists(nestOrphanLists(withoutNav))
       .replace(/<br\s*\/?>/gi, "\n")
-      .replace(/<\/(p|h[1-6]|tr|div|section)>/gi, "\n")
+      .replace(/<\/(p|h[1-6]|tr|div|section|li)>/gi, "\n")
       .replace(/<[^>]+>/g, " "),
   );
   return startFromPolicy(
@@ -314,7 +332,7 @@ function extractBlock(html: string, openRe: RegExp): string | null {
   if (!m || m.index === undefined) return null;
   const start = m.index;
   const tag = m[0].match(/^<([a-z0-9]+)/i)?.[1];
-  if (!tag) return html.slice(start, Math.min(html.length, start + 250_000));
+  if (!tag) return html.slice(start, Math.min(html.length, start + 2_000_000));
   const pair = new RegExp(`</?${tag}\\b[^>]*>`, "gi");
   pair.lastIndex = start + m[0].length;
   let depth = 1;
@@ -324,12 +342,12 @@ function extractBlock(html: string, openRe: RegExp): string | null {
     else depth += 1;
     if (depth === 0) return html.slice(start, t.index + t[0].length);
   }
-  return html.slice(start, Math.min(html.length, start + 250_000));
+  return html.slice(start, Math.min(html.length, start + 2_000_000));
 }
 
 function startFromPolicy(text: string): string {
   const heading = text.search(
-    /(?:^|\n)\s*(privacy policy|terms\s*(?:and|&)\s*conditions|terms of (?:service|use)|return policy|refund policy|cancellation policy|shipping policy|delivery policy|cookie policy|consent policy)\b/i,
+    /(?:^|\n)\s*(privacy policy|terms\s*(?:and|&)\s*conditions|terms of (?:service|use)|returns?\s*(?:and|&)?\s*refund|return policy|refund policy|cancellation policy|shipping policy|shipping\s*(?:and|&)?\s*delivery|delivery policy|cookie policy|consent policy|contact (?:information|us))\b/i,
   );
   if (heading >= 0 && heading < 2500) {
     return text.slice(heading).trim();
@@ -357,7 +375,7 @@ function isFullyHiddenAttrs(attrs: string): boolean {
   return false;
 }
 
-function stripHiddenBlocks(html: string): string {
+function _stripHiddenBlocks(html: string): string {
   const re =
     /<(p|div|span|section|aside|li|h[1-6])\b([^>]*)>([\s\S]*?)<\/\1>/gi;
   let out = html;
@@ -568,6 +586,37 @@ async function fetchPolicyPage(item: {
   hidden?: boolean;
   added?: boolean;
 }): Promise<{ page: FetchedPage; html: string } | null> {
+  // First attempt: fetch live page as PDF via headless browser
+  try {
+    const pdfRes = await fetchLivePageAsPdf(item.url, { timeoutMs: 25000 });
+    if (pdfRes.ok && pdfRes.text.length >= 80) {
+      const title = pdfRes.title || POLICY_LABELS[item.kind];
+      if (!/^\s*404\b|page not found/i.test(title)) {
+        const kind = classify(pdfRes.finalUrl || item.url, title, "") ?? item.kind;
+        return {
+          html: pdfRes.html,
+          page: {
+            kind,
+            label: POLICY_LABELS[kind],
+            url: pdfRes.finalUrl || item.url,
+            title,
+            text: pdfRes.text,
+            chars: pdfRes.chars,
+            status: pdfRes.status,
+            hidden: Boolean(item.hidden),
+            added: Boolean(item.added),
+            fetchedAsPdf: true,
+            pdfPageCount: pdfRes.pdfPageCount,
+            pdfBase64: pdfRes.pdfBase64,
+          },
+        };
+      }
+    }
+  } catch {
+    // Fall back to direct HTML fetch
+  }
+
+  // Fallback attempt: direct HTML fetch
   try {
     const got = await fetchHtml(new URL(item.url));
     if (got.status >= 400 || !got.html) return null;
@@ -589,6 +638,7 @@ async function fetchPolicyPage(item: {
         status: got.status,
         hidden: Boolean(item.hidden),
         added: Boolean(item.added),
+        fetchedAsPdf: false,
       },
     };
   } catch {

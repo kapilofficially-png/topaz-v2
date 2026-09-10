@@ -1,9 +1,7 @@
 import { o as __toESM } from "../_runtime.mjs";
 import { u as require_react } from "./@floating-ui/react-dom+[...].mjs";
 import { n as createContextScope, o as useComposedRefs, s as require_jsx_runtime } from "./@radix-ui/react-collection+[...].mjs";
-import { n as useCallbackRef, r as Primitive } from "./@radix-ui/react-dismissable-layer+[...].mjs";
-import { n as useLayoutEffect2 } from "./@radix-ui/react-id+[...].mjs";
-import { t as Presence } from "./radix-ui__react-presence.mjs";
+import { _ as Presence, g as useCallbackRef, v as useLayoutEffect2, y as Primitive } from "./@radix-ui/react-dialog+[...].mjs";
 import { t as useDirection } from "./radix-ui__react-direction.mjs";
 import { t as clamp } from "./radix-ui__number.mjs";
 import { t as composeEventHandlers } from "./radix-ui__primitive.mjs";

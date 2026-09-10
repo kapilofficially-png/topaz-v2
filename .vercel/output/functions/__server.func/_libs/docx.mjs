@@ -916,8 +916,8 @@ var require_base64_js = /* @__PURE__ */ __commonJSMin(((exports) => {
 		var arr = new Arr(_byteLength(b64, validLen, placeHoldersLen));
 		var curByte = 0;
 		var len = placeHoldersLen > 0 ? validLen - 4 : validLen;
-		var i;
-		for (i = 0; i < len; i += 4) {
+		var i = 0;
+		for (; i < len; i += 4) {
 			tmp = revLookup[b64.charCodeAt(i)] << 18 | revLookup[b64.charCodeAt(i + 1)] << 12 | revLookup[b64.charCodeAt(i + 2)] << 6 | revLookup[b64.charCodeAt(i + 3)];
 			arr[curByte++] = tmp >> 16 & 255;
 			arr[curByte++] = tmp >> 8 & 255;
@@ -21022,8 +21022,8 @@ var require_jszip_min = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 						if (this.diskWithZip64CentralDirStart = this.reader.readInt(4), this.relativeOffsetEndOfZip64CentralDir = this.reader.readInt(8), this.disksCount = this.reader.readInt(4), 1 < this.disksCount) throw new Error("Multi-volumes zip are not supported");
 					},
 					readLocalFiles: function() {
-						var e, t;
-						for (e = 0; e < this.files.length; e++) t = this.files[e], this.reader.setIndex(t.localHeaderOffset), this.checkSignature(s.LOCAL_FILE_HEADER), t.readLocalPart(this.reader), t.handleUTF8(), t.processAttributes();
+						var e = 0, t;
+						for (; e < this.files.length; e++) t = this.files[e], this.reader.setIndex(t.localHeaderOffset), this.checkSignature(s.LOCAL_FILE_HEADER), t.readLocalPart(this.reader), t.handleUTF8(), t.processAttributes();
 					},
 					readCentralDir: function() {
 						var e;
@@ -21402,8 +21402,8 @@ var require_jszip_min = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 					var r = a.deflateInit2(this.strm, t.level, t.method, t.windowBits, t.memLevel, t.strategy);
 					if (r !== l) throw new Error(i[r]);
 					if (t.header && a.deflateSetHeader(this.strm, t.header), t.dictionary) {
-						var n;
-						if (n = "string" == typeof t.dictionary ? h.string2buf(t.dictionary) : "[object ArrayBuffer]" === u.call(t.dictionary) ? new Uint8Array(t.dictionary) : t.dictionary, (r = a.deflateSetDictionary(this.strm, n)) !== l) throw new Error(i[r]);
+						var n = "string" == typeof t.dictionary ? h.string2buf(t.dictionary) : "[object ArrayBuffer]" === u.call(t.dictionary) ? new Uint8Array(t.dictionary) : t.dictionary;
+						if ((r = a.deflateSetDictionary(this.strm, n)) !== l) throw new Error(i[r]);
 						this._dict_set = !0;
 					}
 				}
@@ -21504,8 +21504,8 @@ var require_jszip_min = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 						else for (var s = 0; s < n; s++) e[i + s] = t[r + s];
 					},
 					flattenChunks: function(e) {
-						var t, r, n, i, s, a;
-						for (t = n = 0, r = e.length; t < r; t++) n += e[t].length;
+						var t = n = 0, r = e.length, n, i, s, a;
+						for (; t < r; t++) n += e[t].length;
 						for (a = new Uint8Array(n), t = i = 0, r = e.length; t < r; t++) s = e[t], a.set(s, i), i += s.length;
 						return a;
 					}
@@ -22682,8 +22682,8 @@ while (n === a[++i] && n === a[++i] && n === a[++i] && n === a[++i] && n === a[+
 					}
 				}
 				function W(e) {
-					var t;
-					for (t = 0; t < l; t++) e.dyn_ltree[2 * t] = 0;
+					var t = 0;
+					for (; t < l; t++) e.dyn_ltree[2 * t] = 0;
 					for (t = 0; t < f; t++) e.dyn_dtree[2 * t] = 0;
 					for (t = 0; t < c; t++) e.bl_tree[2 * t] = 0;
 					e.dyn_ltree[2 * m] = 1, e.opt_len = e.static_len = 0, e.last_lit = e.matches = 0;

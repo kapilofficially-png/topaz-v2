@@ -64,12 +64,12 @@ function __generator(thisArg, body) {
 		},
 		trys: [],
 		ops: []
-	}, f, y, t, g;
-	return g = {
+	}, f, y, t, g = {
 		next: verb(0),
 		"throw": verb(1),
 		"return": verb(2)
-	}, typeof Symbol === "function" && (g[Symbol.iterator] = function() {
+	};
+	return typeof Symbol === "function" && (g[Symbol.iterator] = function() {
 		return this;
 	}), g;
 	function verb(n) {

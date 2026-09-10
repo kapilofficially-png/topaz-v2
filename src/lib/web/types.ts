@@ -97,6 +97,12 @@ export type FetchedPage = {
   hidden: boolean;
   /** Fetched because the drafter pasted the URL, not the crawler. */
   added: boolean;
+  /** True when page was rendered and extracted via headless PDF pipeline */
+  fetchedAsPdf?: boolean;
+  /** Number of pages generated in the rendered PDF */
+  pdfPageCount?: number;
+  /** Base64-encoded PDF document buffer for preview / download */
+  pdfBase64?: string;
 };
 
 export function pageUrlKey(url: string) {

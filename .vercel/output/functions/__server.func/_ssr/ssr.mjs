@@ -1,10 +1,10 @@
 import { r as __exportAll } from "../_runtime.mjs";
 import { u as require_react } from "../_libs/@floating-ui/react-dom+[...].mjs";
-import { A as invariant, D as resolveManifestCssLink, E as resolveManifestAssetLink, F as isResolvedRedirect, I as parseRedirect, L as rootRouteId, O as _getRenderedMatches, P as isRedirect, R as isNotFound, T as getStylesheetHref, a as isSsrResponse, c as stripSsrResponseBody, f as RouterProvider, i as disposeSsrResponseDetached, k as executeRewriteInput, n as bindSsrResponseToRequest, o as normalizeSsrResponse, r as defineHandlerCallback, s as replaceSsrResponse, t as renderRouterToStream, w as getScriptPreloadAttrs } from "../_libs/@tanstack/react-router+[...].mjs";
+import { A as executeRewriteInput, D as resolveManifestAssetLink, E as getStylesheetHref, F as isResolvedRedirect, I as parseRedirect, O as resolveManifestCssLink, P as isRedirect, R as rootRouteId, T as getScriptPreloadAttrs, a as isSsrResponse, c as stripSsrResponseBody, f as RouterProvider, i as disposeSsrResponseDetached, k as _getRenderedMatches, n as bindSsrResponseToRequest, o as normalizeSsrResponse, r as defineHandlerCallback, s as replaceSsrResponse, t as renderRouterToStream, z as isNotFound } from "../_libs/@tanstack/react-router+[...].mjs";
 import { n as createMemoryHistory } from "../_libs/tanstack__history.mjs";
 import { a as getOrigin, c as createSerializationAdapter, d as toCrossJSONAsync, f as toCrossJSONStream, i as getNormalizedURL, l as makeSerovalPlugin, n as mergeHeaders, o as defaultSerovalPlugins, r as attachRouterServerSsrUtils, s as createRawStreamRPCPlugin, t as waitForRequest, u as fromJSON } from "../_libs/@tanstack/router-core+[...].mjs";
 import { s as require_jsx_runtime } from "../_libs/@radix-ui/react-collection+[...].mjs";
-import { n as toResponse, t as H3Event } from "../_libs/h3-v2+rou3.mjs";
+import { n as toResponse, t as H3Event } from "../_libs/h3-v2.mjs";
 import { AsyncLocalStorage } from "node:async_hooks";
 //#region node_modules/.nitro/vite/services/ssr/index.js
 var ssr_exports = /* @__PURE__ */ __exportAll({
@@ -89,7 +89,7 @@ var HEADERS = { TSS_SHELL: "X-TSS_SHELL" };
 * the dev styles URL for route-scoped CSS collection.
 */
 async function getStartManifest(matchedRoutes) {
-	const { tsrStartManifest } = await import("../_tanstack-start-manifest_v-B-rbEs1T.mjs");
+	const { tsrStartManifest } = await import("../_tanstack-start-manifest_v-Dee7avOb.mjs");
 	const startManifest = tsrStartManifest();
 	let routes = startManifest.routes;
 	routes[rootRouteId];
@@ -109,65 +109,93 @@ async function getStartManifest(matchedRoutes) {
 	};
 }
 var manifest = {
+	"207fb66681fdc66a57afd5576674d37ed15d560068f17c16ba716e671a6bb44c": {
+		functionName: "writeColdEmailFn_createServerFn_handler",
+		importer: () => import("./store-audit-D869_jgl.mjs")
+	},
+	"3599ab5b0008c073b5d2aaf34b8bec5add7c5baf750bdcef159d08ef9a7ce1ce": {
+		functionName: "fetchStorePageFn_createServerFn_handler",
+		importer: () => import("./store-audit-D869_jgl.mjs")
+	},
+	"3aa7874f159443a71e910f8e470884ad747e6f0ac8655d87345502f3bbabf915": {
+		functionName: "providerStatusFn_createServerFn_handler",
+		importer: () => import("./chat-76eG5Gsj.mjs")
+	},
 	"3fb2668851f685aa37a4a76a99d75c1721981a5fdf0111b283560dd62977bb47": {
 		functionName: "writeImplementationsFn_createServerFn_handler",
-		importer: () => import("./store-audit-DTsISExr.mjs")
+		importer: () => import("./store-audit-D869_jgl.mjs")
+	},
+	"44c2c554a644f4f665be8b63a0bdad8e8a18c78c59d76a24b74cd490f0a534af": {
+		functionName: "miniAiAnalyzeAndModifyFn_createServerFn_handler",
+		importer: () => import("./mini-ai-CTk4Y-yt.mjs")
 	},
 	"4f7155dd2f550a8b28c4ab89c1fed1b1f906a61b4602753361f7341ef2dbd6e6": {
 		functionName: "researchStoreFn_createServerFn_handler",
-		importer: () => import("./store-audit-DTsISExr.mjs")
+		importer: () => import("./store-audit-D869_jgl.mjs")
+	},
+	"4fbc98f425424428229c18156fd4f05a1329fb68d2be5bee2c75b53ef5842f7f": {
+		functionName: "testProviderFn_createServerFn_handler",
+		importer: () => import("./chat-76eG5Gsj.mjs")
 	},
 	"533a8b4c32c06ab444ff7725d6a054040af35976a717f7f732605d9168e68d1f": {
 		functionName: "getAuthority_createServerFn_handler",
-		importer: () => import("./legal-CIPaljvg.mjs")
+		importer: () => import("./legal-DDHGyFr7.mjs")
+	},
+	"56be78f9e0361b1232350a015870f77753d9f7db475a2d48e934c6e3e9224644": {
+		functionName: "writeServiceAgreementFn_createServerFn_handler",
+		importer: () => import("./store-audit-D869_jgl.mjs")
 	},
 	"7c381e5591386a541903c168e3accc2fa3b43d121ce5b60117a283708d0edc2a": {
 		functionName: "auditStoreFn_createServerFn_handler",
-		importer: () => import("./store-audit-DTsISExr.mjs")
+		importer: () => import("./store-audit-D869_jgl.mjs")
 	},
 	"87860d3d820f6f38f39d1c2f753d6ec6dc7f2142fefac3920dc68b3adc357ebb": {
 		functionName: "refineDraft_createServerFn_handler",
-		importer: () => import("./legal-CIPaljvg.mjs")
+		importer: () => import("./legal-DDHGyFr7.mjs")
 	},
 	"9349d6ebb66212266cbf9e0875c42504b4643a32eadc1fef1e8ee8b143e707ad": {
 		functionName: "refineStorePolicyFn_createServerFn_handler",
-		importer: () => import("./store-audit-DTsISExr.mjs")
+		importer: () => import("./store-audit-D869_jgl.mjs")
 	},
 	"946f65fb0f70125389cf9076bce1d39727c79c824f29ab692fae036bb8dc46d7": {
 		functionName: "askTheLaw_createServerFn_handler",
-		importer: () => import("./legal-CIPaljvg.mjs")
+		importer: () => import("./legal-DDHGyFr7.mjs")
+	},
+	"94b272f0eeb8c6cd6a44aa936db7cea6b7fb569652a71336346d129900a85b97": {
+		functionName: "fetchGeminiModelsFn_createServerFn_handler",
+		importer: () => import("./chat-76eG5Gsj.mjs")
 	},
 	"9db5fa05632ccac9d2a4639a77f21e9ce6c24fc80e99090991f9e816357d8836": {
 		functionName: "writeQuestionnaireFn_createServerFn_handler",
-		importer: () => import("./store-audit-DTsISExr.mjs")
+		importer: () => import("./store-audit-D869_jgl.mjs")
 	},
 	"a5fc8baeafad675aa0de68feea6f84486de09fb2a0583d9ffe6942d609e3475c": {
 		functionName: "writeSellingPointsFn_createServerFn_handler",
-		importer: () => import("./store-audit-DTsISExr.mjs")
+		importer: () => import("./store-audit-D869_jgl.mjs")
 	},
 	"b4e6719e87b0c179f560cf803195605155147dca549f3145d09eb556dddddbb7": {
 		functionName: "findPolicyGapsFn_createServerFn_handler",
-		importer: () => import("./store-audit-DTsISExr.mjs")
+		importer: () => import("./store-audit-D869_jgl.mjs")
 	},
 	"cf9b87416e91d277d94e20cefba312bdcda9778d4ccc075b5e4bdd6c6ddfaad1": {
 		functionName: "writeForwardEmailFn_createServerFn_handler",
-		importer: () => import("./store-audit-DTsISExr.mjs")
+		importer: () => import("./store-audit-D869_jgl.mjs")
 	},
 	"e01f2916e08d10faea50b5e328a52de250fe16b797113148bf07781efa299c1b": {
 		functionName: "generateDraft_createServerFn_handler",
-		importer: () => import("./legal-CIPaljvg.mjs")
+		importer: () => import("./legal-DDHGyFr7.mjs")
 	},
 	"f509c245be4050eefe37fe33937ce7a367c07ab44c186efccb21254f96d6c5b4": {
 		functionName: "writeClientBriefFn_createServerFn_handler",
-		importer: () => import("./store-audit-DTsISExr.mjs")
+		importer: () => import("./store-audit-D869_jgl.mjs")
 	},
 	"f7e22f2d46bf71f69fff264ae438baf4e0bed29457c15d42a697414a7f8a921a": {
 		functionName: "listAuthorities_createServerFn_handler",
-		importer: () => import("./legal-CIPaljvg.mjs")
+		importer: () => import("./legal-DDHGyFr7.mjs")
 	},
 	"fef6b9a14abf3390243bc546041f329f7f4c34640b19142602d5e7dd06359caf": {
 		functionName: "searchAuthorities_createServerFn_handler",
-		importer: () => import("./legal-CIPaljvg.mjs")
+		importer: () => import("./legal-DDHGyFr7.mjs")
 	}
 };
 async function getServerFnById(id, access) {
@@ -460,13 +488,16 @@ var createMiddleware = (options, __opts) => {
 		}
 	};
 };
+var csrfSymbol = Symbol.for("tanstack-start:csrf-middleware");
 var innerCreateCsrfMiddleware = (opts = {}) => {
-	return createMiddleware().server(async (ctx) => {
+	const middleware = createMiddleware().server(async (ctx) => {
 		const csrfCtx = ctx;
 		if (opts.filter && !await opts.filter(csrfCtx)) return ctx.next();
 		if (await isCsrfRequestAllowed(opts, csrfCtx)) return ctx.next();
 		return getFailureResponse(opts, csrfCtx);
 	});
+	Object.defineProperty(middleware, csrfSymbol, { value: true });
+	return middleware;
 };
 var createCsrfMiddleware = innerCreateCsrfMiddleware;
 async function isCsrfRequestAllowed(opts, ctx) {
@@ -697,7 +728,7 @@ var handleServerAction = async ({ request, context, serverFnId }) => {
 		try {
 			let res = await (async () => {
 				if (FORM_DATA_CONTENT_TYPES.some((type) => contentType && contentType.includes(type))) {
-					if (methodUpper === "GET") invariant();
+					if (methodUpper === "GET") throw new Error("Invariant failed: GET requests with FormData payloads are not supported");
 					const formData = await request.formData();
 					const serializedContext = formData.get(TSS_FORMDATA_CONTEXT);
 					formData.delete(TSS_FORMDATA_CONTEXT);
@@ -709,7 +740,9 @@ var handleServerAction = async ({ request, context, serverFnId }) => {
 					if (typeof serializedContext === "string") try {
 						const deserializedContext = fromJSON(JSON.parse(serializedContext), { plugins: serovalPlugins });
 						if (typeof deserializedContext === "object" && deserializedContext) params.context = safeObjectMerge(deserializedContext, context);
-					} catch (e) {}
+					} catch (e) {
+						console.warn("Failed to parse FormData context:", e);
+					}
 					return await action(params);
 				}
 				if (methodUpper === "GET") {
@@ -1430,6 +1463,7 @@ function getStartResponseHeaders(opts) {
 	}));
 }
 var entriesPromise;
+var hasWarnedMissingCsrfMiddleware = false;
 var defaultCsrfMiddleware = createCsrfMiddleware({ filter: (ctx) => ctx.handlerType === "serverFn" });
 var getCachedBaseManifest = createCachedBaseManifestLoader(() => getStartManifest());
 var getProdBaseManifest = () => getCachedBaseManifest();
@@ -1437,7 +1471,7 @@ var getBaseManifest = getProdBaseManifest;
 var createEarlyHintsForRequest = createEarlyHintsCollector;
 async function loadEntries() {
 	const [routerEntry, startEntry, pluginAdapters] = await Promise.all([
-		import("./router-DCUOXfE1.mjs").then((n) => n.t),
+		import("./router-BaHigX3m.mjs").then((n) => n.t),
 		import("./start-5Z2QO8AU.mjs"),
 		import("./empty-plugin-adapters-D9UWiqvJ.mjs")
 	]);
@@ -1451,11 +1485,39 @@ function getEntries() {
 	if (!entriesPromise) entriesPromise = loadEntries();
 	return entriesPromise;
 }
+function hasCsrfMiddleware(middlewares) {
+	return middlewares.some((middleware) => csrfSymbol in middleware);
+}
+function warnMissingCsrfMiddlewareOnce() {
+	if (hasWarnedMissingCsrfMiddleware) return;
+	hasWarnedMissingCsrfMiddleware = true;
+	console.warn(`TanStack Start server functions are not protected by the CSRF middleware.
+
+Server functions are same-origin RPC endpoints and should be protected from cross-site requests.
+
+Add the CSRF middleware in src/start.ts:
+
+  const csrfMiddleware = createCsrfMiddleware({
+    filter: (ctx) => ctx.handlerType === 'serverFn',
+  })
+
+  export const startInstance = createStart(() => ({
+    requestMiddleware: [csrfMiddleware],
+  }))
+
+If you intentionally handle CSRF another way, disable this warning:
+
+  tanstackStart({
+    serverFns: {
+      disableCsrfMiddlewareWarning: true,
+    },
+  })`);
+}
 var ROUTER_BASEPATH = "/";
 var SERVER_FN_BASE = "/_serverFn/";
 var IS_PRERENDERING = process.env.TSS_PRERENDERING === "true";
 var IS_SHELL_ENV = process.env.TSS_SHELL === "true";
-var IS_DEV = false;
+var IS_DEV = true;
 var ERR_NO_RESPONSE = IS_DEV ? `It looks like you forgot to return a response from your server route handler. If you want to defer to the app router, make sure to have a component set in this route.` : "Internal Server Error";
 var ERR_NO_DEFER = IS_DEV ? `You cannot defer to the app router if there is no component defined on this route.` : "Internal Server Error";
 function throwRouteHandlerError() {
@@ -1692,6 +1754,7 @@ function createStartHandler(cbOrOptions) {
 				return router;
 			};
 			if (SERVER_FN_BASE && url.pathname.startsWith(SERVER_FN_BASE)) {
+				if (!hasCsrfMiddleware(flattenedRequestMiddlewares)) warnMissingCsrfMiddlewareOnce();
 				const serverFnId = url.pathname.slice(SERVER_FN_BASE.length).split("/")[0];
 				if (!serverFnId) throw new Error("Invalid server action param for serverFnId");
 				const serverFnHandler = async ({ context }) => {
@@ -1883,4 +1946,4 @@ function createServerEntry(entry) {
 }
 var server_default = createServerEntry({ fetch });
 //#endregion
-export { ssr_exports as i, createServerFn as n, getServerFnById as r, TSS_SERVER_FUNCTION as t };
+export { createServerEntry, server_default as default, ssr_exports as i, TSS_SERVER_FUNCTION as n, getServerFnById as r, createServerFn as t };
