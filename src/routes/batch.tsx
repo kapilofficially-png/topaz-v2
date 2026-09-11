@@ -378,6 +378,7 @@ function BatchPage() {
                 <table className="w-full min-w-[640px] text-left text-sm">
                   <thead>
                     <tr className="border-b border-border text-[12px] tracking-wide text-muted uppercase">
+                      <th className="py-2.5 pr-2 font-medium w-10">#</th>
                       <th className="py-2.5 pr-3 font-medium">Store</th>
                       <th className="py-2.5 pr-3 font-medium">Pages Crawled</th>
                       <th className="py-2.5 pr-3 font-medium">Rewritten Policies</th>
@@ -386,8 +387,11 @@ function BatchPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {archive.summaries.map((s) => (
+                    {archive.summaries.map((s, idx) => (
                       <tr key={s.host} className="border-b border-border/70 hover:bg-surface-2/40 transition-colors">
+                        <td className="py-2.5 pr-2 font-mono text-xs font-semibold text-muted">
+                          #{idx + 1}
+                        </td>
                         <td className="py-2.5 pr-3">
                           <div className="font-medium text-ink">
                             {s.homeTitle || s.host}

@@ -76,11 +76,16 @@ const safeStorage = createJSONStorage(() => ({
       try {
         const parsed = JSON.parse(value) as { state?: { drafts?: SavedDraft[] } };
         const drafts = parsed.state?.drafts ?? [];
-        const reduced = {
-          ...parsed,
-          state: { ...parsed.state, drafts: drafts.slice(0, 12) },
-        };
-        localStorage.setItem(name, JSON.stringify(reduced));
+        // Keep all drafts intact without discarding stores; slim down older draft texts if quota is tight
+        const slimmed = drafts.map((d, i) => ({
+          ...d,
+          draftText: i < 10 ? d.draftText : d.draftText.slice(0, 2000),
+          citations: (d.citations || []).slice(0, 3),
+        }));
+        localStorage.setItem(
+          name,
+          JSON.stringify({ ...parsed, state: { ...parsed.state, drafts: slimmed } }),
+        );
       } catch {
         /* device full — keep the in-memory copy */
       }

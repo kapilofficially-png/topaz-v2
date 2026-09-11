@@ -2,7 +2,8 @@ import { create } from "zustand";
 import type { ExtractedHints, FetchedPage, PolicyKind } from "@/lib/web/types";
 import { pageUrlKey } from "@/lib/web/types";
 import type { RefinedPolicy } from "@/lib/drafts/audit-store";
-import type { SavedCitation } from "@/lib/drafts/store";
+import type { SavedCitation, SavedDraft } from "@/lib/drafts/store";
+import { parseDraftOutput } from "@/lib/drafts/parse";
 
 export type AiModificationRecord = {
   id: string;
@@ -372,3 +373,95 @@ export const useStoreArchive = create<StoreArchiveState>((set, get) => ({
 if (typeof window !== "undefined") {
   void useStoreArchive.getState().init();
 }
+
+export function storeReviewToDrafts(s: SavedStoreReview): SavedDraft[] {
+  if (!s || !s.host) return [];
+  const host = cleanHost(s.host);
+  const facts = { website: s.origin || `https://${host}`, host };
+  const out: SavedDraft[] = [];
+  const createdAt = s.updatedAt || s.createdAt || Date.now();
+
+  // 1. Research paper from crawled pages
+  if (s.pages && s.pages.length > 0) {
+    out.push({
+      id: `store-research::${host}`,
+      slug: "store-research",
+      title: `Research — ${host}`,
+      createdAt,
+      facts,
+      draftText: s.pages
+        .map(
+          (p) =>
+            `## ${p.label || p.kind}\n${p.title || p.url}\n${p.url}\n(${p.chars ? p.chars.toLocaleString("en-IN") : 0} characters)${p.hidden ? " · hidden" : ""}\n\n${(p.text || "").slice(0, 12_000)}`,
+        )
+        .join("\n\n"),
+      notes: (s.missing || []).map((m) => m.label).join(", "),
+      citations: s.citations || [],
+    });
+  }
+
+  // 2. Audit against Indian law
+  if (s.findings && s.findings.trim()) {
+    out.push({
+      id: `store-audit::${host}`,
+      slug: "store-audit",
+      title: `Store audit — ${host}`,
+      createdAt,
+      facts,
+      draftText: s.findings,
+      notes: (s.missing || []).map((m) => m.label).join(", "),
+      citations: s.citations || [],
+    });
+  }
+
+  // 3. Rewritten / Refined policies
+  if (s.refined && s.refined.length > 0) {
+    for (const item of s.refined) {
+      const parsed = parseDraftOutput(item.raw || "");
+      out.push({
+        id: `${item.slug}::${host}::${item.url || item.kind}`,
+        slug: item.slug,
+        title: `${item.title || "Policy"} — ${host}`,
+        createdAt,
+        facts: {
+          ...facts,
+          url: item.url,
+          kind: item.kind,
+          pageTitle: item.title,
+        },
+        draftText: parsed.draft || item.raw || "",
+        notes: parsed.notes || "",
+        citations: s.citations || [],
+      });
+    }
+  }
+
+  // 4. Secondary papers
+  const papers: [string, string, string | undefined][] = [
+    ["store-gaps", "Gap register", s.gapsPaper],
+    ["store-brief", "Client brief", s.briefPaper],
+    ["store-questions", "Legal facts", s.questionsPaper],
+    ["store-implement", "Implementations", s.implementPaper],
+    ["store-selling", "Selling points", s.sellingPaper],
+    ["store-email", "Forwarding emails", s.emailPaper],
+    ["store-cold", "Cold email", s.coldPaper],
+    ["store-agreement", "Service agreement", s.agreementPaper],
+  ];
+
+  for (const [slug, title, body] of papers) {
+    if (!body || !body.trim()) continue;
+    out.push({
+      id: `${slug}::${host}`,
+      slug,
+      title: `${title} — ${host}`,
+      createdAt,
+      facts,
+      draftText: body,
+      notes: "",
+      citations: s.citations || [],
+    });
+  }
+
+  return out;
+}
+

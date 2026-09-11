@@ -1198,6 +1198,7 @@ function AuditPage() {
 
   function saveAllWork(quiet = false) {
     const n = saveSessionPapers();
+    void useAuditStore.getState().persistToArchive();
     if (!quiet) {
       const host = useAuditStore.getState().host;
       toast.success(

@@ -123,7 +123,7 @@ export function StoreArchiveSelector({
               </div>
             ) : (
               <div className="divide-y divide-border/40">
-                {archive.summaries.map((s) => {
+                {archive.summaries.map((s, idx) => {
                   const isActive = s.host === activeHost;
                   return (
                     <div
@@ -136,6 +136,9 @@ export function StoreArchiveSelector({
                     >
                       <div className="min-w-0 flex-1 pr-2">
                         <div className="flex items-center gap-1.5">
+                          <span className="font-mono text-[10px] font-semibold text-muted bg-surface-2 border border-border/70 px-1 py-0.2 rounded shrink-0">
+                            #{idx + 1}
+                          </span>
                           <span className="truncate font-medium text-ink">
                             {s.homeTitle || s.host}
                           </span>
